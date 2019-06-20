@@ -1,8 +1,4 @@
-### Preface
-
-Many modern processors provide performance monitoring unit (PMU), which is a set of counters/controls often used by software tools like **perf** in Linux or **hwpmc** in BSDs. Current RISC-V privileged spec also includes PMU-related features, but we claim that they are not sufficient for general use of performance monitoring.
-
-In this proposal, we will address what current spec lacks and provide the solutions we have in Andes Technology, taking Linux perf as an example.  We believe that this proposal will serve as a starting point of discussion towards improving RISC-V PMU.
+The current facility provided by RISC-V hardware performance monitors (HPM) is not sufficient for general use, e.g. **perf** in Linux or **hwpmc** in BSDs.  In this proposal, we will address what current spec lacks and provide the solutions we have in Andes Technology, taking Linux perf as an example.  We believe that this proposal will serve as a starting point of discussion towards improving RISC-V HPM.
 
 ### Background -- Perf Sampling
 
@@ -24,21 +20,21 @@ Eventually the counter overflows, and triggers an interrupt.  The ISR should
 ### Problems
 
 1. Writable counters/controls in S-mode
-Tools like perf are the core driver of performance monitoring, and they often reside in kernel space.  Perf tends to take full control of all the hardware counters/control registers in PMU, so that it can even profile the performance of its underlying hypervisor if itself is inside a virtualization environment.  However, obeying to the hierarchical philosophy of RISC-V, M-mode is the real owner of PMU-related CSRs.  Counters are read-only shadows in S-mode, and controls are either shadows (e.g. `hpmevent*`) or M-mode exclusive (`mcounterinhibit`).
+Tools like perf are the core driver of performance monitoring, and they often reside in kernel space.  Perf tends to take full control of the whole HPM, so that it can even profile the performance of its underlying hypervisor if itself is inside a virtualization environment.  However, obeying to the hierarchical philosophy of RISC-V, M-mode is the real owner of HPM CSRs.  Counters are read-only shadows in S-mode, and controls are either shadows (e.g. `hpmevent*`) or M-mode exclusive (`mcounterinhibit`).
 
 2. Mode selections
-Perf supports profiling in different privileged modes, e.g. sampling the whole system every 1000 cycles in the user space.  Current spec has no supports to this feature.
+Perf can profile different privileged modes or their combinations, e.g. sampling the whole system every 1000 cycles in the user space only or in kernel and hypervisor.  Current spec has no such support.
 
 3. No counter-triggered interrupt
-Current spec supports no features like this.
+Current spec has no such support.
 
 ### Implementation in AndeStar™ V5
 
-From our experience, PMU features can be enhanced by adding critical CSRs.  Note that all following CSRs have the same length as official `*counteren` registers:
+From our experience, RISC-V HPM can be enhanced by adding critical CSRs.  Note that all following CSRs have the same length as `*counteren` registers:
 
 |CSR name|Description|Related to Problem|
 |---|---|---|
-|`mcounterwen`|Each counter has one bit to allow/deny write accesses to PMU-related CSRs from S-mode.  The firmware/M-mode initialization can thus turn this register on or off during boot time, so that the OS can directly manipulate any required CSRs.  An alternative is to implement SBI calls to modify PMU-related counters and controls, but obviously it introduces large overhead.|write access from S-mode|
+|`mcounterwen`|Each counter has one bit to allow/deny write accesses to HPM CSRs from S-mode.  The firmware/M-mode initialization can thus turn this register on or off during boot time, so that the OS can directly manipulate any required CSRs.  An alternative is to implement SBI calls to modify HPM counters and controls, but obviously it introduces large overhead.|write access from S-mode|
 |`[m\|s]countermask_[m\|s\|u]`|Each counter has three mode-selection mask bits that profiling software can manipulate.|mode selection|
 |`[m\|s]counterinen`(\*)|Each counter has one bit indicating to or not to trigger an interrupt when an overflow happens.|counter-triggered interrupt|
 |`[m\|s]counterovf`(\*)|In ISR, scanning this CSR to know which counters have overflowed.|counter-triggered interrupt|
