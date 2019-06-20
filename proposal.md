@@ -9,7 +9,7 @@ The basic steps of perf sampling are as follows,
    + set the value of the counter to `MAX - period`, where `MAX` is its maximum value and `period` is a given sampling period based on specified events.
 
 2. Running
-When a target program is being sampled, the counter increases by 1 each time the events happen.
+When a target program is being sampled, the counter is increased by 1 each time the events happen.
 
 3. Interrupt handling
 Eventually, the counter overflows and triggers an interrupt.  The ISR should
