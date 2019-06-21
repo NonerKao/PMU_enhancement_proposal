@@ -1,4 +1,4 @@
-The current facility provided by RISC-V hardware performance monitors (HPM) is not sufficient for general use, e.g. **perf** in Linux or **hwpmc** in BSDs.  In this proposal, we will address what current spec lacks and provide the solutions we have in Andes Technology, taking Linux perf as an example.  We believe that this proposal will serve as a starting point of discussion towards improving RISC-V HPM.
+The current facility provided by RISC-V hardware performance monitors (HPM) is not sufficient for general use, e.g. **perf** in Linux or **hwpmc** in BSDs.  In this proposal, we will address what current spec lacks and provide the solutions we have in our prototype, taking Linux perf as an example.  We believe that this proposal will serve as a starting point of discussion towards improving RISC-V HPM.
 
 ### Background -- Perf Sampling
 
@@ -28,9 +28,9 @@ Perf can profile different privileged modes or their combinations, e.g. sampling
 3. No counter-triggered interrupt
 The current spec has no such support.
 
-### Implementation in AndeStar™ V5
+### Implementation in Our Prototype
 
-From our experience, RISC-V HPM can be enhanced by adding critical CSRs.  Note that all following CSRs have the same length as `*counteren` registers:
+From our experiences, RISC-V HPM can be enhanced by adding critical CSRs.  Note that all following CSRs have the same length as `*counteren` registers:
 
 |CSR name|Description|Related to Problem|
 |---|---|---|
