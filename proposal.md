@@ -1,26 +1,33 @@
-The current facility provided by RISC-V hardware performance monitors (HPM) is not sufficient for general use, e.g. **perf** in Linux or **hwpmc** in BSDs.  In this proposal, we will address what current spec lacks and provide the solutions we have in our prototype, taking Linux perf as an example.  We believe that this proposal will serve as a starting point of discussion towards improving RISC-V HPM.
+The current facility provided by RISC-V hardware performance monitors (HPM) requires more capabilities to support **perf** in Linux or **hwpmc** in BSDs.  In this proposal, we will discuss the deficiencies in the privileged spec v1.0, taking Linux perf as an example.  Further, we will share our solution as a reference.
 
-### Background -- Perf Sampling
+### Perf Sampling in RISC-V
 
-The basic steps of perf sampling are as follows,
-1. Initialization: translating inputs to parameters
-   + set up events of interests.
-   + allocate a counter and set up the binding with the events.
-   + set the value of the counter to `MAX - period`, where `MAX` is its maximum value and `period` is a given sampling period based on specified events.
+**Scenario:** A user want to sample a program every 1000000 cycles in U-mode and S-mode
 
-2. Running
-When a target program is being sampled, the counter is increased by 1 each time the events happen.
+**Input:** `period = 1000; events = [cycles]; modes = [u, s]`
 
-3. Interrupt handling
-Eventually, the counter overflows and triggers an interrupt.  The ISR should
-   1. reset the counter value to `MAX - period`
-   2. (architecture independent) sample the pc of the target program/whole system
-   3. return
+**Output:** A trace of sampled pcs of the program
+
+1. Set a counter to its maximum value minus `period`
+2. Set the corresponding event mask `events`
+3. Set the corresponding mode selector `modes`
+4. Start the target program
+5. Increase the counter by one each time the events marked by `events` happens in privileged modes `modes`
+6. Trigger an interrupt when the counter overflows
+7. Sample current pc
+8. Reset counter as step 2
+9. Resume the program, go to step 4
 
 ### Problems
 
-1. Writable counters/controls in S-mode
-Tools like perf are the core driver of performance monitoring, and they often reside in kernel space.  Perf tends to take full control of the whole HPM so that it can even profile the performance of its underlying hypervisor if itself is inside a virtualization environment.  However, obeying to the hierarchical philosophy of RISC-V, M-mode is the real owner of HPM CSRs.  Counters are read-only shadow in S-mode, and controls are either shadows (e.g. `hpmevent*`) or M-mode exclusive (`mcounterinhibit`).
+* (Functional) No counter-triggered interrupt
+The current spec has no such support.
+* (Functional) No mode selection
+* (Performance) No writtable HPM counters/controls in S-mode
+
+1. HPM counters/controls are not writable in S-mode
+
+Perf is the core driver of performance monitoring, and they often reside in kernel space.  Perf tends to take full control of the whole HPM so that it can even profile the performance of its underlying hypervisor if itself is inside a virtualization environment.  However, obeying to the hierarchical philosophy of RISC-V, M-mode is the real owner of HPM CSRs.  Counters are read-only shadow in S-mode, and controls are either shadows (e.g. `hpmevent*`) or M-mode exclusive (`mcounterinhibit`).
 
 2. Mode selections
 Perf can profile different privileged modes or their combinations, e.g. sampling the whole system every 1000 cycles in the user space only or in kernel and hypervisor.  The current spec has no such support.
