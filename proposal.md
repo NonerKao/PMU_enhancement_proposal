@@ -4,7 +4,7 @@ The current facility provided by RISC-V hardware performance monitors (HPM) requ
 
 **Scenario:** A user want to sample a program every 1000000 cycles in U-mode and S-mode
 
-**Input:** `period = 1000; events = [cycles]; modes = [u, s]`
+**Input:** `period = 1000000; events = [cycles]; modes = [u, s]`
 
 **Output:** A trace of sampled pcs of the program
 
