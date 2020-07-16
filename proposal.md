@@ -5,9 +5,7 @@ hardware performance monitor counter overflows.
 
 because current spec doesn't have one. Even if such an interrupt exists, we are still lacking functionalities to handle the interrupts with the current HPM (Hardware Performance Monitor, interchangeable with PMU for Performance Monitoring Unit) CSRs. In this proposal, we will address the problems after tracing a slightly-reduced Linux `perf record` case, by adding a few HPM-related CSRs, which are used in practice since mid-2018 in AndeStar V5 series.
 
-### Background -- Perf Sampling
-
-The basic steps of perf sampling are as follows,
+### Perf Sampling: Brief Steps
 
 1. Initialization: parse inputs
    1. setup the events of interests.
