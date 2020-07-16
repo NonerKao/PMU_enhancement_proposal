@@ -40,7 +40,7 @@ We propose a set of CSRs for this: **`mcountermask_[m|s|u]` (Machine Counter Mas
 #### Writable counters/controls in S-mode
 Tools like perf are the core driver of performance monitoring, and they often reside in kernel space.  Perf tends to take full control of all the hardware counters/control registers in HPM, so that it can even profile the performance of its underlying hypervisor if itself is inside a virtualization environment.  However, obeying to the hierarchical philosophy of RISC-V, M-mode is the real owner of PMU-related CSRs.  Counters are read-only shadows in S-mode, and controls are either shadows (e.g. `hpmevent*`) or M-mode exclusive (`mcounterinhibit`).  As a result, the steps 1.1, 1.3, 3.2 and 3.3 in the perf case should trigger instruction emulation or SBI calls to the higher privileged mode, which is a significant overhead.
 
-We propose a CSR, **`mcounterwen` (Machine Counter-Write-Enable)**, for tools like perf to take full control of HPM CSRs. A HPM counter register (and its related bit in `xhpmevent`, `xcountermask*`, etc) can be directly written from S-mode if the corresponding bit in `mcounterwen` is set. S-mode alias is created according to this: `shpmevent`, `scounteren`, `scounterovf`, and `scounterinhibit`.
+We propose a CSR, **`mcounterwen` (Machine Counter-Write-Enable)**, for tools like perf to take full control of HPM CSRs. A HPM counter register (and its related bit in `xhpmevent`, `xcountermask*`, etc) can be directly written from S-mode if the corresponding bit in `mcounterwen` is set. S-mode aliases are created according to this: `shpmevent`, `scounteren`, `scounterovf`, and `scounterinhibit`.
 
 For M-S-U configuration this works well, but we need more feedback regarding H-extension.
 
