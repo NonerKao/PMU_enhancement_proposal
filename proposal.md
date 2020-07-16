@@ -55,6 +55,6 @@ All comments are appreciated.
 ### References
 There were two previous presentations regarding this solution.  One is at the [RISC-V microconference of LPC'18](https://www.youtube.com/watch?v=4OKkHCg7El0&t=2h20m53s), and the other is at [RISC-V Workshop Taiwan 2019](https://www.youtube.com/watch?v=Onvlcl4e2IU).  The later one is a brief summary of this proposal, except for the fact that `counterinhibit` register has been included in the spec.
 
-We released software implementation of perf in Linux kernel along with AndeStar V5 since two years ago. Related source code can be found on [github](https://github.com/andestech/linux/blob/RISCV-Linux-4.17-bsp-v5_1_0-branch/arch/riscv/kernel/perf_event.c). [Some discussions](https://lkml.org/lkml/2020/6/29/1617) on Linux mailing list suggest the PMU driver needs a total re-write, but the implementation is sufficient as a reference.
+We released off-tree perf porting since two years ago. Related source code can be found on [github](https://github.com/andestech/linux/blob/RISCV-Linux-4.17-bsp-v5_1_0-branch/arch/riscv/kernel/perf_event.c). [Some discussions](https://lkml.org/lkml/2020/6/29/1617) on Linux mailing list suggest the PMU driver needs a total re-write, but the implementation is sufficient as a reference.
 
 Currently there are discussions in Unixplatform Spec Task Group about [PMU SBI extension](https://lists.riscv.org/g/tech-unixplatformspec/message/156). Our proposal is parallel to the PMU SBI extension work.
