@@ -2,13 +2,14 @@
 In Section 3.1.11 in Privileged Spec, the note shows that
 > A future revision of this specification will define a mechanism to generate an interrupt when a
 hardware performance monitor counter overflows.
+
 because current spec doesn't have one. Even if such an interrupt exists, we are still lacking functionalities to handle the interrupts with the current HPM (Hardware Performance Monitor, interchangeable with PMU for Performance Monitoring Unit) CSRs. In this proposal, we will address the problems after tracing a slightly-reduced Linux `perf record` case, by adding a few HPM-related CSRs, which are used in practice since mid-2018 in AndeStar V5 series.
 
 ### Background -- Perf Sampling
 
 The basic steps of perf sampling are as follows,
 
-1. Initialization: translating inputs to parameters
+1. Initialization: parse inputs
    1. setup the events of interests.
    2. allocate a counter register and setup the binding with the events.
    3. set the value of the counter to `MAX - period`, where `MAX` is its maximum value and `period` is a given sampling period based on specified events.
@@ -26,7 +27,7 @@ Eventually the counter an overflow, which triggers an interrupt.  The ISR should
 ### Problems and Solutions
 
 #### Counter-triggered interrupt
-Such interrupts need to be a local one so PLIC is not the way to go. We suggest using [CLIC (Core-Local Interrupt Controller)](https://github.com/riscv/riscv-fast-interrupt) after it is ratified. The foundation should also consider if this feature worth a reserved interrupt number to be shown in `xcause` registers.
+Such an interrupt need to be a local one so PLIC is not the way to go. We suggest using [CLIC (Core-Local Interrupt Controller)](https://github.com/riscv/riscv-fast-interrupt) after it is ratified. The foundation should also consider if this feature is worth a reserved interrupt number to be shown in `xcause` registers.
 
 Besides the interrupt mechanism itself, we propose a set of CSRs to help process a counter-overflow interrupt,
 + **`mcounterinen` (Machine Counter Interrupt Enable)**: The steps 1.4 and 3.5 require this feature. 
